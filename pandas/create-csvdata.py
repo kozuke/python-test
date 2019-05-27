@@ -1,35 +1,23 @@
+import csv
 import urllib.request
 from bs4 import BeautifulSoup
 
+# J1の順位表を含むページのURL
 url = 'https://www.nikkansports.com/soccer/jleague/j1/data/standings/'
 with urllib.request.urlopen(url) as res:
     html = res.read().decode('UTF-8')
-    print(html)
-    #print(html.decode('utf-8'))
-    #print(res.read())
-    #print(res.read().decode('utf-8'))
-
-#print(res.read().decode('utf-8'))
-    #html = res.read().decode('utf-8')
-
-#print(html)
-#
-    #soup = BeautifulSoup(res, 'html.parser')
-    #print(soup.select('#schWrap'))
-
-#print(soup.html)R
-
-
-#print(soup.find(id='standing'))
-#print(soup.select('table#standing'))
-#print(soup.select('table#standing > thread'))
-
-#print(soup.select_one('table#standing'))
-
-# for a in soup.select('table#standing'):
-#     print(a).string
-
-
-
-#print(soup.select('table#standing > thread > tr > th'))
-#print(soup.select_one('#standing_wrapper > div > div.dataTables_scrollHead > div > table > thead > tr > th:nth-child(4)'))
+    # BeautifulSoupで扱う
+    soup = BeautifulSoup(html, 'html.parser')
+    print(type(soup))
+    # 順位表のテーブルを指定
+    table = soup.find('table', {'class': 'dataTable'})
+    # tr要素を抽出→業の塊を抽出
+    rows = table.findAll('tr')
+    # csvデータの書き込み
+    with open('j1ranking.csv', 'w', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        for row in rows:
+            csvRow = []
+            for cell in row.findAll(['td', 'th']):
+                csvRow.append(cell.string)
+            writer.writerow(csvRow)
